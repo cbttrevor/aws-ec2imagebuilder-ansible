@@ -1,0 +1,24 @@
+name: 'Run Ansible on Ubuntu Linux'
+description: 'Deploy Ansible Playbook onto an Ubuntu Linux VM.'
+schemaVersion: 1.0
+phases:
+  - name: build
+    steps:
+      - name: InstallAnsibleLint
+        action: ExecuteBash
+        inputs:
+          commands:
+            - apt-get update && apt-get upgrade --yes
+            - apt-get install python3-pip --yes
+            - pip3 install ansible-lint
+      - name: RetrieveAnsiblePlaybook
+        action: S3Download
+        inputs:
+          - source: s3://ansible-2374892243234/01-ubuntu.yml
+            destination: /tmp/01-ubuntu.yml
+      - name: RunAnsible
+        action: ExecuteBash
+        inputs:
+          commands:
+            - ansible-lint /tmp/01-ubuntu.yml
+            - ansible-playbook /tmp/01-ubuntu.yml
